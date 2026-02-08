@@ -180,7 +180,10 @@ def evaluate(
             print(f'Accuracy at thr ({thr}): ', acc)
             print(f'Sensitivity (recall) at thr ({thr}): ', recall)
             print(f'G-mean at thr ({thr}): ', gmean)
-            dmetrics = {'auroc': auroc, 'ap': ap, 'acc': acc, 'sensitivity': recall, 'gmean': gmean, 'thr':thr}
+            dmetrics = {'fold': fold, 'checkpoint': checkpoint, 
+                        'auroc': auroc, 'ap': ap, 
+                        'acc': acc, 'sensitivity': recall, 'gmean': gmean, 
+                        'thr':thr}
             with open(f"{softmax_dir}/metrics.json", "w") as f: 
                 json.dump(dmetrics, f, indent=2)
 

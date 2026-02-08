@@ -1,7 +1,7 @@
 #%%
 from picai_baseline.nnunet.eval import evaluate
 
-for f in [1,2,3,4]:
+for f in [0,1,2,3,4]:
     evaluate(
         task="Task2403_p158_prostate_nnunet",  # Task2403_p158_prostate_nnunet, Task2303_uc_prostate_nnunet
         trainer="nnUNetTrainerV2_Loss_FL_and_CE_checkpoints",
