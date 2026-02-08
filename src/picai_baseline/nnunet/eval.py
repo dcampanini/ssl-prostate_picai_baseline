@@ -69,7 +69,8 @@ def evaluate(
         task_dir = workdir / "results" / "nnUNet" / "3d_fullres" / task
     else:
         task_dir = workdir / task_dir
-
+    
+    # este bloque lee los splits de evaluacion
     if isinstance(splits, str):
         if splits == "":
             splits = None
@@ -89,6 +90,7 @@ def evaluate(
                 # `splits` should be the path to a json file containing the splits
                 print(f"Loading splits from {splits}")
 
+    # this is False, el codigo no entra aqui
     if isinstance(softmax_postprocessing_func, str):
         if softmax_postprocessing_func == "extract_lesion_candidates":
             def softmax_postprocessing_func(pred):
@@ -108,13 +110,18 @@ def evaluate(
             softmax_dir = Path(pred_folder)
             metrics_path = softmax_dir / metrics_fn.replace(r"{checkpoint}", checkpoint).replace(r"{threshold}", threshold).replace("{fold}", str(fold))
 
-            if metrics_path.exists():
-                print(f"Metrics found at {metrics_path}, skipping..")
-                continue
-            else:
-                print(f"Metrics will be saved to {metrics_path}.")
+            # if metrics_path.exists():
+            #     print(f"Metrics found at {metrics_path}, skipping..")
+            #     continue
+            # else:
+            #     print(f"Metrics will be saved to {metrics_path}.")
 
+            print(f"Metrics will be saved to {metrics_path}.")
+
+            # list with the path to the .npz files
             original_softmax_prediction_paths = softmax_dir.glob("*.npz")
+
+            #original_softmax_prediction_paths = softmax_dir.glob("*.nii.gz")
 
             if verbose >= 2:
                 print(f"Predictions folder: {softmax_dir}")
@@ -149,6 +156,7 @@ def evaluate(
                 y_true_dir = workdir / labels_folder.replace(r"{fold}", str(fold))
 
             # evaluate
+            #import pdb; pdb.set_trace()
             metrics = evaluate_folder(
                 y_det_dir=softmax_dir,
                 y_true_dir=y_true_dir,
@@ -161,7 +169,20 @@ def evaluate(
             # save and show metrics
             metrics.save(metrics_path)
             print(f"Results for checkpoint {checkpoint}:")
-            print(metrics)
+            auroc = round(metrics.auroc,3)
+            ap = round(metrics.AP,3)
+            thr = 0.5
+            acc = metrics.accuracy_at_thr(thr)
+            precision, recall = metrics.calculate_precision_recall_at_thr(thr)
+            gmean = metrics.gmean_at_thr(thr)
+            print(f'AUROC: {auroc}')
+            print(f'AP: {ap}')
+            print(f'Accuracy at thr ({thr}): ', acc)
+            print(f'Sensitivity (recall) at thr ({thr}): ', recall)
+            print(f'G-mean at thr ({thr}): ', gmean)
+            dmetrics = {'auroc': auroc, 'ap': ap, 'acc': acc, 'sensitivity': recall, 'gmean': gmean, 'thr':thr}
+            with open(f"{softmax_dir}/metrics.json", "w") as f: 
+                json.dump(dmetrics, f, indent=2)
 
 
 def main():
