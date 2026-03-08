@@ -175,15 +175,22 @@ def evaluate(
             acc = metrics.accuracy_at_thr(thr)
             precision, recall = metrics.calculate_precision_recall_at_thr(thr)
             gmean = metrics.gmean_at_thr(thr)
+            print("=" * 25)
+            print(f'Fold: {fold}')
             print(f'AUROC: {auroc}')
             print(f'AP: {ap}')
             print(f'Accuracy at thr ({thr}): ', acc)
             print(f'Sensitivity (recall) at thr ({thr}): ', recall)
             print(f'G-mean at thr ({thr}): ', gmean)
-            dmetrics = {'fold': fold, 'checkpoint': checkpoint, 
-                        'auroc': auroc, 'ap': ap, 
-                        'acc': acc, 'sensitivity': recall, 'gmean': gmean, 
-                        'thr':thr}
+            dmetrics = {'fold': fold, 
+                        'checkpoint': checkpoint, 
+                        'auroc': auroc, 
+                        'ap': ap, 
+                        'acc': acc, 
+                        'sensitivity': recall, 
+                        'gmean': gmean, 
+                        'thr':thr
+                    }
             with open(f"{softmax_dir}/metrics.json", "w") as f: 
                 json.dump(dmetrics, f, indent=2)
 
